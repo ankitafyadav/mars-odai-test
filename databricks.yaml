@@ -1,20 +1,51 @@
 bundle:
   name: dbx_poc
 
+# ================================
+# Environments (Dev / Prod)
+# ================================
+targets:
+  dev:
+    default: true
+    workspace:
+      host: https://957456311226827.7.gcp.databricks.com
+
+  prod:
+    workspace:
+      host: https://957456311226827.7.gcp.databricks.com
+      # You can add a separate PROD workspace later if needed
+
+# ================================
+# Workflows (Jobs)
+# ================================
 resources:
   jobs:
-    ingest_job:
+    poc_ingest_job:
       name: "POC Ingest Job"
       tasks:
-        - task_key: ingest_task
+        - task_key: run_ingest
           notebook_task:
-            notebook_path: notebooks/Aprimotodbx
-          job_cluster_key: default_cluster
+            notebook_path: notebooks/ingest    # <= your notebook here
+          job_cluster_key: poc_cluster
+          timeout_seconds: 3600
+      tags:
+        project: "git-db-poc"
 
+# ================================
+# Cluster Definition
+# ================================
   clusters:
-    default_cluster:
+    poc_cluster:
       spark_version: "14.3.x-scala2.12"
       node_type_id: "n1-standard-4"
       autoscale:
         min_workers: 1
         max_workers: 2
+
+# ================================
+# Permissions (Optional)
+# ================================
+permissions:
+  jobs.poc_ingest_job:
+    - level: CAN_MANAGE_RUN
+      group_name: users

@@ -1,55 +1,22 @@
-name: Databricks CI/CD
+Run databricks bundle validate
+  databricks bundle validate
+  shell: /usr/bin/bash -e {0}
+  env:
+    pythonLocation: /opt/hostedtoolcache/Python/3.10.19/x64
+    PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.10.19/x64/lib/pkgconfig
+    Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.10.19/x64
+    Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.10.19/x64
+    Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.10.19/x64
+    LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.10.19/x64/lib
+    DATABRICKS_HOST: ***
+    DATABRICKS_TOKEN: ***
+Usage: databricks [OPTIONS] COMMAND [ARGS]...
+Try 'databricks -h' for help.
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
+Error: No such command 'bundle'.
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+Warning: The version of the CLI you are using is deprecated.
+To migrate to the new CLI, see https://docs.databricks.com/dev-tools/cli/migrate.html.
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      # ⭐ Install Databricks CLI v2 (stable binary install)
-      - name: Install Databricks CLI v2
-        run: |
-          curl -L -o databricks.tar.gz https://github.com/databricks/cli/releases/latest/download/databricks_linux_amd64.tar.gz
-          tar -xzf databricks.tar.gz
-          sudo mv databricks /usr/local/bin/
-          databricks version
-
-      # ⭐ Verify version
-      - name: Check CLI Version
-        run: databricks version
-
-      # ⭐ Setup Auth
-      - name: Configure Databricks Authentication
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-        run: echo "Authentication variables loaded."
-
-      # ⭐ Validate Bundle
-      - name: Validate Bundle
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-        run: databricks bundle validate
-
-      # ⭐ Deploy Bundle
-      - name: Deploy Bundle
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-        run: databricks bundle deploy --target dev
-
-      # ⭐ Run Databricks Job
-      - name: Run Job
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-        run: databricks bundle run --job poc_ingest_job --target dev
+In the new CLI, commands and flags might be different.
+The preceding migration guide provides guidance about how to adapt your commands accordingly.

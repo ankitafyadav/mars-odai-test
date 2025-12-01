@@ -1,4 +1,4 @@
-name: Databricks CI/CD Pipeline
+name: Databricks CI/CD
 
 on:
   push:
@@ -7,12 +7,11 @@ on:
   pull_request:
 
 jobs:
-  databricks-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Setup Python
@@ -20,35 +19,25 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install Databricks CLI v2
+      - name: Install Databricks CLI & bundle tools
         run: |
           pip install databricks-cli
 
-      # 👇 AUTH FIX FOR CLI v2
-      - name: Configure Databricks Authentication
+      - name: Authenticate to Databricks
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
-          echo "Environment variables set. Databricks CLI v2 will auto-authenticate."
+          databricks configure --host "$DATABRICKS_HOST" --token "$DATABRICKS_TOKEN"
 
-      - name: Validate Bundle
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      - name: Validate Databricks Asset Bundle
         run: |
           databricks bundle validate
 
-      - name: Deploy to Databricks (DEV)
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      - name: Deploy Bundle to Databricks
         run: |
-          databricks bundle deploy --target dev
+          databricks bundle deploy
 
-      - name: Run Databricks Job
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      - name: Run Job
         run: |
-          databricks bundle run --job poc_ingest_job --target dev
+          databricks bundle run --job ingest_job

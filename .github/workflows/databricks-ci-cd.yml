@@ -11,35 +11,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      # ⭐ Install the NEW Databricks CLI v2
       - name: Install Databricks CLI v2
         run: |
           curl -fsSL https://raw.githubusercontent.com/databricks/cli/main/install.sh | bash
           sudo mv ~/.databricks/bin/databricks /usr/local/bin/databricks
+
+      # ⭐ Verify CLI version (must show v0.xxx)
+      - name: Check Databricks CLI version
+        run: |
           databricks version
 
+      # ⭐ Auth (env variables only)
       - name: Configure Databricks Authentication
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: echo "Auth env vars loaded."
 
+      # ⭐ Validate Bundle
       - name: Validate Bundle
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-        run: databricks bundle validate
+        run: |
+          databricks bundle validate
 
+      # ⭐ Deploy Bundle
       - name: Deploy Bundle
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-        run: databricks bundle deploy --target dev
-
-      - name: Run Job
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-        run: databricks bundle run --job poc_ingest_job --target dev
+        run: |
+          databricks bundle deploy --target dev

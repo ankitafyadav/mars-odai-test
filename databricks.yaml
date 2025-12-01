@@ -8,7 +8,7 @@ resources:
       tasks:
         - task_key: ingest_task
           notebook_task:
-            notebook_path: notebooks/ingest
+            notebook_path: notebooks/Aprimotodbx
           job_cluster_key: default_cluster
 
   clusters:

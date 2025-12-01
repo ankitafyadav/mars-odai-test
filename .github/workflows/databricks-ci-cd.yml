@@ -1,4 +1,4 @@
-name: Databricks CI/CD
+name: Databricks CI/CD Pipeline
 
 on:
   push:
@@ -7,37 +7,45 @@ on:
   pull_request:
 
 jobs:
-  build-deploy:
+  databricks-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repo
+
+      # 1️⃣ Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
+      # 2️⃣ Setup Python
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
+      # 3️⃣ Install Databricks CLI v2
       - name: Install Databricks CLI
         run: |
           pip install databricks-cli
 
-      - name: Configure Databricks Auth
+      # 4️⃣ Authenticate using GitHub Secrets
+      - name: Configure Databricks Authentication
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
-          databricks configure --host $DATABRICKS_HOST --token $DATABRICKS_TOKEN
+          databricks configure --host "$DATABRICKS_HOST" --token "$DATABRICKS_TOKEN"
 
-      - name: Validate Bundle
+      # 5️⃣ Validate Asset Bundle
+      - name: Validate Databricks Bundle
         run: |
           databricks bundle validate
 
-      - name: Deploy to Databricks
+      # 6️⃣ Deploy to Databricks (DEV by default)
+      - name: Deploy to Databricks (DEV)
         run: |
-          databricks bundle deploy
+          databricks bundle deploy --target dev
 
-      - name: Run Job
+      # 7️⃣ Run the Job after Deployment
+      - name: Run Databricks Job
         run: |
-          databricks bundle run --job ingest_job
+          databricks bundle run --job poc_ingest_job --target dev

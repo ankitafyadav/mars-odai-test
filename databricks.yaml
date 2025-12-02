@@ -8,7 +8,7 @@ targets:
   dev:
     default: true
     workspace:
-      host: https://957456311226827.7.gcp.databricks.com
+      host: ${env.DATABRICKS_HOST}
 
   prod:
     workspace:

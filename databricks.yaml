@@ -25,7 +25,7 @@ resources:
       tasks:
         - task_key: run_ingest
           notebook_task:
-            notebook_path: notebooks/ingest    # <= your notebook here
+            notebook_path: notebooks/Aprimotodbx    # <= your notebook here
           job_cluster_key: poc_cluster
           timeout_seconds: 3600
       tags:

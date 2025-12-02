@@ -1,38 +1,39 @@
-name: Databricks CI/CD (DAB)
+name: Databricks CI/CD Pipeline
 
 on:
   push:
     branches:
-      - main
+      - main       # change if your default branch is different
   pull_request:
 
 jobs:
   deploy:
-    name: Validate & Deploy to Dev
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout code
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # ✅ Install / Setup Databricks CLI via official Action
+      # 2️⃣ Setup Databricks CLI (official action)
       - name: Setup Databricks CLI
         uses: databricks/setup-cli@main
-        with:
-          host: ${{ secrets.DATABRICKS_HOST }}
-          token: ${{ secrets.DATABRICKS_TOKEN }}
 
-      # ✅ Validate the Asset Bundle
+      # 3️⃣ Configure authentication for CLI v2
+      - name: Configure Databricks Authentication
+        run: |
+          echo "DATABRICKS_HOST=${{ secrets.DATABRICKS_HOST }}" >> $GITHUB_ENV
+          echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_TOKEN }}" >> $GITHUB_ENV
+          echo "DATABRICKS_CONFIG_PROFILE=DEFAULT" >> $GITHUB_ENV
+
+      # 4️⃣ Validate the DAB bundle
       - name: Validate DAB
         run: databricks bundle validate
-        working-directory: .
 
-      # ✅ Deploy the bundle (to `dev`)
+      # 5️⃣ Deploy bundle to DEV environment
       - name: Deploy Bundle (dev)
         run: databricks bundle deploy --target dev
-        working-directory: .
 
-      # ✅ (Optional) Run a job defined in the bundle
-      - name: Run job from bundle
+      # 6️⃣ Optional: Run job from bundle after deployment
+      - name: Run Databricks Job
         run: databricks bundle run --job poc_ingest_job --target dev
-        working-directory: .

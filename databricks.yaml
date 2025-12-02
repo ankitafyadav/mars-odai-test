@@ -1,54 +1,39 @@
 bundle:
   name: dbx_poc
 
-# =========================================================
-# GLOBAL VARIABLES
-# =========================================================
 variables:
   brand_name: {}
   collection_url: {}
 
-# =========================================================
-# DEV ENVIRONMENT
-# =========================================================
 targets:
   dev:
     default: true
     workspace:
       root_path: /Workspace/Repos/ankit.af.yadav@accenture.com/mars-odai-test
-
     variables:
       brand_name: "scinkers"
       collection_url: "5e230de5cee846f18c90b39c00e94f56"
 
-# =========================================================
-# RESOURCES → JOB + JOB CLUSTER
-# =========================================================
 resources:
 
   jobs:
     poc_ingest_job:
       name: aprimotodbx
 
-      # ✔ DEFINED HERE (correct place)
+      # ✔ Use serverless compute (required for GCP)
       job_clusters:
         - job_cluster_key: poc_cluster
           new_cluster:
-            spark_version: "14.3.x-scala2.12"
-            node_type_id: "n1-standard-4"
-            autoscale:
-              min_workers: 1
-              max_workers: 3
+            serverless: true
 
       tasks:
         - task_key: run_main_notebook
           notebook_task:
-            notebook_path: "notebooks/Aprimo_to_dbx- Dev_Final.ipynb"
+            notebook_path: notebooks/Aprimo_to_dbx- Dev_Final.ipynb
             base_parameters:
               brand_name: ${var.brand_name}
               collection_url: ${var.collection_url}
-
-          job_cluster_key: poc_cluster  # ✔ Now this exists
+          job_cluster_key: poc_cluster
           timeout_seconds: 7200
 
       tags:

@@ -26,8 +26,6 @@ resources:
             base_parameters:
               brand_name: ${var.brand_name}
               collection_url: ${var.collection_url}
-          job_cluster_key: poc_cluster
-          timeout_seconds: 7200
 
       tags:
         env: dev

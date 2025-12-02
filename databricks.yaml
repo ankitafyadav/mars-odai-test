@@ -17,4 +17,4 @@ resources:
       tasks:
         - task_key: run_notebook
           notebook_task:
-            notebook_path: notebooks/poc_notebook
+            notebook_path: notebooks/Aprimotodbx

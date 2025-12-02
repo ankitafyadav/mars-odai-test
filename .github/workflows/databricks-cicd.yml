@@ -3,7 +3,7 @@ name: Databricks CI/CD Pipeline
 on:
   push:
     branches:
-      - main       # change if your default branch is different
+      - main
   pull_request:
 
 jobs:
@@ -15,25 +15,25 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # 2️⃣ Setup Databricks CLI (official action)
+      # 2️⃣ Install Databricks CLI v2 (official action)
       - name: Setup Databricks CLI
         uses: databricks/setup-cli@main
 
-      # 3️⃣ Configure authentication for CLI v2
+      # 3️⃣ Configure authentication variables for CLI v2
       - name: Configure Databricks Authentication
         run: |
           echo "DATABRICKS_HOST=${{ secrets.DATABRICKS_HOST }}" >> $GITHUB_ENV
           echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_TOKEN }}" >> $GITHUB_ENV
           echo "DATABRICKS_CONFIG_PROFILE=DEFAULT" >> $GITHUB_ENV
 
-      # 4️⃣ Validate the DAB bundle
+      # 4️⃣ Validate your Asset Bundle
       - name: Validate DAB
         run: databricks bundle validate
 
-      # 5️⃣ Deploy bundle to DEV environment
+      # 5️⃣ Deploy bundle to Dev target
       - name: Deploy Bundle (dev)
         run: databricks bundle deploy --target dev
 
-      # 6️⃣ Optional: Run job from bundle after deployment
+      # 6️⃣ Run the job defined in the bundle (correct CLI v2 syntax)
       - name: Run Databricks Job
-        run: databricks bundle run --job poc_ingest_job --target dev
+        run: databricks bundle run poc_ingest_job --target dev

@@ -1,13 +1,22 @@
 bundle:
   name: dbx_poc
 
+# =========================================================
+# GLOBAL VARIABLE DEFINITIONS (REQUIRED)
+# =========================================================
+variables:
+  brand_name: ""
+  collection_url: ""
+
+# =========================================================
+# DEV ENVIRONMENT (values assigned here)
+# =========================================================
 targets:
   dev:
     default: true
     workspace:
       root_path: /Workspace/Repos/ankit.af.yadav@accenture.com/mars-odai-test
 
-    # ✔ HERE you pass your parameter VALUES
     variables:
       brand_name: "scinkers"
       collection_url: "5e230de5cee846f18c90b39c00e94f56"
@@ -16,10 +25,6 @@ targets:
 # RESOURCES → JOB + CLUSTER
 # =========================================================
 resources:
-
-  # -------------------------------------------------------
-  # JOB: Aprimo → Databricks Ingestion Job
-  # -------------------------------------------------------
   jobs:
     poc_ingest_job:
       name: aprimotodbx
@@ -28,7 +33,6 @@ resources:
           notebook_task:
             notebook_path: "notebooks/Aprimo_to_dbx- Dev_Final.ipynb"
 
-            # ✔ THESE are passed to your notebook
             base_parameters:
               brand_name: ${var.brand_name}
               collection_url: ${var.collection_url}
@@ -40,9 +44,6 @@ resources:
         env: dev
         project: aprimo
 
-  # -------------------------------------------------------
-  # CLUSTER CONFIG FOR DEV
-  # -------------------------------------------------------
   clusters:
     poc_cluster:
       spark_version: "14.3.x-scala2.12"

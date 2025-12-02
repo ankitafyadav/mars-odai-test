@@ -2,8 +2,7 @@ name: Databricks CI/CD
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
   pull_request:
 
 jobs:
@@ -14,30 +13,44 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-
-      - name: Install Databricks CLI & bundle tools
+      # 1. Remove old CLI v1
+      - name: Remove old Databricks CLI
         run: |
-          pip install databricks-cli
+          sudo rm -f /usr/local/bin/databricks || true
+          pip uninstall -y databricks-cli || true
 
-      - name: Authenticate to Databricks
+      # 2. Install Databricks CLI v2
+      - name: Install Databricks CLI v2
+        run: |
+          curl -L -o databricks.tar.gz https://github.com/databricks/cli/releases/latest/download/databricks_linux_amd64.tar.gz
+          tar -xzf databricks.tar.gz
+          chmod +x databricks
+          sudo mv databricks /usr/local/bin/databricks
+          databricks version
+
+      - name: Check CLI Version
+        run: databricks version
+
+      - name: Configure Databricks Auth
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-        run: |
-          databricks configure --host "$DATABRICKS_HOST" --token "$DATABRICKS_TOKEN"
+        run: echo "Auth loaded."
 
-      - name: Validate Databricks Asset Bundle
-        run: |
-          databricks bundle validate
+      - name: Validate Databricks Bundle
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: databricks bundle validate
 
-      - name: Deploy Bundle to Databricks
-        run: |
-          databricks bundle deploy
+      - name: Deploy Bundle
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: databricks bundle deploy --target dev
 
-      - name: Run Job
-        run: |
-          databricks bundle run --job ingest_job
+      - name: Run Databricks Job
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: databricks bundle run --job poc_ingest_job --target dev

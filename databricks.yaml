@@ -3,7 +3,7 @@ bundle:
 
 variables:
   brand_name: {}
-  collection_url: {}
+  collection_id: {}
 
 targets:
   dev:
@@ -25,7 +25,7 @@ resources:
             notebook_path: notebooks/Aprimo_to_dbx- Dev_Final.ipynb
             base_parameters:
               brand_name: ${var.brand_name}
-              collection_url: ${var.collection_id}
+              collection_id: ${var.collection_id}
 
       tags:
         env: dev

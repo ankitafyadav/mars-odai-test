@@ -2,14 +2,14 @@ bundle:
   name: dbx_poc
 
 # =========================================================
-# GLOBAL VARIABLE DEFINITIONS (REQUIRED)
+# GLOBAL VARIABLE DEFINITIONS (MUST BE MAPS)
 # =========================================================
 variables:
-  brand_name: ""
-  collection_url: ""
+  brand_name: {}
+  collection_url: {}
 
 # =========================================================
-# DEV ENVIRONMENT (values assigned here)
+# DEV ENVIRONMENT
 # =========================================================
 targets:
   dev:
@@ -25,6 +25,7 @@ targets:
 # RESOURCES → JOB + CLUSTER
 # =========================================================
 resources:
+
   jobs:
     poc_ingest_job:
       name: aprimotodbx
@@ -32,11 +33,9 @@ resources:
         - task_key: run_main_notebook
           notebook_task:
             notebook_path: "notebooks/Aprimo_to_dbx- Dev_Final.ipynb"
-
             base_parameters:
               brand_name: ${var.brand_name}
               collection_url: ${var.collection_url}
-
           job_cluster_key: poc_cluster
           timeout_seconds: 7200
 

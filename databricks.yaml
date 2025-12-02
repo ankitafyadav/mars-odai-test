@@ -15,16 +15,15 @@ targets:
       collection_url: "5e230de5cee846f18c90b39c00e94f56"
 
 resources:
-
   jobs:
     poc_ingest_job:
       name: aprimotodbx
 
-      # ✔ Use serverless compute (required for GCP)
       job_clusters:
         - job_cluster_key: poc_cluster
           new_cluster:
             serverless: true
+            spark_version: "14.3.x-scala2.12"   # ✔ REQUIRED
 
       tasks:
         - task_key: run_main_notebook

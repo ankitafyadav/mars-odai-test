@@ -46,6 +46,7 @@ resources:
 # Permissions (Optional)
 # ================================
 permissions:
-  jobs.poc_ingest_job:
-    - level: CAN_MANAGE_RUN
-      group_name: users
+  - group_name: admins
+    permission_level: CAN_MANAGE
+
+

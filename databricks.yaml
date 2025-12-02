@@ -2,19 +2,20 @@ bundle:
   name: dbx_poc
 
 workspace:
-  # Do NOT set host here — Databricks forbids interpolation
-  root_path: /Workspace/Repos/ankit.af.yadav@accenture.com/dbx_poc
+  # Host is NEVER allowed here — it comes from env in CI/CD
+  root_path: /Workspace/Repos/ankit.af.yadav@accenture.com/mars-odai-test
 
 targets:
   dev:
     workspace:
-      root_path: /Workspace/Repos/ankit.af.yadav@accenture.com/dbx_poc
+      root_path: /Workspace/Repos/ankit.af.yadav@accenture.com/mars-odai-test
 
 resources:
   jobs:
     poc_ingest_job:
       name: poc_ingest_job
       tasks:
-        - task_key: run_notebook
+        - task_key: run_main_notebook
           notebook_task:
-            notebook_path: notebooks/Aprimotodbx
+            # 👇 Replace this file later with your REAL notebook
+            notebook_path: notebooks/Aprimotodbx.ipynb

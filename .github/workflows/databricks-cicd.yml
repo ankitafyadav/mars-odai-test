@@ -1,0 +1,38 @@
+name: Databricks CI/CD (DAB)
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  deploy:
+    name: Validate & Deploy to Dev
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # ✅ Install / Setup Databricks CLI via official Action
+      - name: Setup Databricks CLI
+        uses: databricks/setup-cli@main
+        with:
+          host: ${{ secrets.DATABRICKS_HOST }}
+          token: ${{ secrets.DATABRICKS_TOKEN }}
+
+      # ✅ Validate the Asset Bundle
+      - name: Validate DAB
+        run: databricks bundle validate
+        working-directory: .
+
+      # ✅ Deploy the bundle (to `dev`)
+      - name: Deploy Bundle (dev)
+        run: databricks bundle deploy --target dev
+        working-directory: .
+
+      # ✅ (Optional) Run a job defined in the bundle
+      - name: Run job from bundle
+        run: databricks bundle run --job poc_ingest_job --target dev
+        working-directory: .

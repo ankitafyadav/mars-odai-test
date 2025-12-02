@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "config": {
+    "bundle": {
+      "git": {
+        "branch": "main",
+        "origin_url": "https://github.com/ankitafyadav/mars-odai-test",
+        "commit": "8abf8268becf6dc393d60359a9400c1469bb50f3",
+        "bundle_root_path": "."
+      }
+    },
+    "workspace": {
+      "file_path": "/Workspace/Repos/ankit.af.yadav@accenture.com/mars-odai-test/files"
+    },
+    "resources": {
+      "jobs": {
+        "poc_ingest_job": {
+          "id": "952291303613552",
+          "relative_path": "databricks.yaml"
+        }
+      }
+    },
+    "presets": {
+      "source_linked_deployment": false
+    }
+  },
+  "extra": {}
+}

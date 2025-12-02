@@ -19,9 +19,6 @@ resources:
     poc_ingest_job:
       name: aprimotodbx
 
-      job_clusters:
-        - job_cluster_key: poc_cluster
-
       tasks:
         - task_key: run_main_notebook
           notebook_task:

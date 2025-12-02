@@ -1,21 +1,52 @@
 bundle:
   name: dbx_poc
 
-workspace:
-  # Host is NEVER allowed here — it comes from env in CI/CD
-  root_path: /Workspace/Repos/ankit.af.yadav@accenture.com/mars-odai-test
-
 targets:
   dev:
+    default: true
     workspace:
       root_path: /Workspace/Repos/ankit.af.yadav@accenture.com/mars-odai-test
 
+    # ✔ HERE you pass your parameter VALUES
+    variables:
+      brand_name: "scinkers"
+      collection_url: "5e230de5cee846f18c90b39c00e94f56"
+
+# =========================================================
+# RESOURCES → JOB + CLUSTER
+# =========================================================
 resources:
+
+  # -------------------------------------------------------
+  # JOB: Aprimo → Databricks Ingestion Job
+  # -------------------------------------------------------
   jobs:
     poc_ingest_job:
-      name: poc_ingest_job
+      name: aprimotodbx
       tasks:
         - task_key: run_main_notebook
           notebook_task:
-            # 👇 Replace this file later with your REAL notebook
-            notebook_path: notebooks/Aprimotodbx.ipynb
+            notebook_path: "notebooks/Aprimo_to_dbx- Dev_Final.ipynb"
+
+            # ✔ THESE are passed to your notebook
+            base_parameters:
+              brand_name: ${var.brand_name}
+              collection_url: ${var.collection_url}
+
+          job_cluster_key: poc_cluster
+          timeout_seconds: 7200
+
+      tags:
+        env: dev
+        project: aprimo
+
+  # -------------------------------------------------------
+  # CLUSTER CONFIG FOR DEV
+  # -------------------------------------------------------
+  clusters:
+    poc_cluster:
+      spark_version: "14.3.x-scala2.12"
+      node_type_id: "n1-standard-4"
+      autoscale:
+        min_workers: 1
+        max_workers: 3

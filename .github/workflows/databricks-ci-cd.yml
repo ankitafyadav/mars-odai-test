@@ -13,29 +13,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 1. Remove old CLI v1
-      - name: Remove old Databricks CLI
+      # Remove old CLI
+      - name: Remove old CLI
         run: |
           sudo rm -f /usr/local/bin/databricks || true
           pip uninstall -y databricks-cli || true
 
-      # 2. Install Databricks CLI v2
+      # Install Databricks CLI v2 (correct tar.gz)
       - name: Install Databricks CLI v2
         run: |
           curl -L -o databricks.tar.gz https://github.com/databricks/cli/releases/latest/download/databricks_linux_amd64.tar.gz
           tar -xzf databricks.tar.gz
-          chmod +x databricks
+          sudo chmod +x databricks
           sudo mv databricks /usr/local/bin/databricks
           databricks version
-
-      - name: Check CLI Version
-        run: databricks version
 
       - name: Configure Databricks Auth
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-        run: echo "Auth loaded."
+        run: echo "Auth loaded"
 
       - name: Validate Databricks Bundle
         env:
@@ -43,7 +40,7 @@ jobs:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: databricks bundle validate
 
-      - name: Deploy Bundle
+      - name: Deploy Databricks Bundle
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}

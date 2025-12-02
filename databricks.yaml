@@ -4,16 +4,17 @@ bundle:
 # ================================
 # Environments (Dev / Prod)
 # ================================
+bundle:
+  name: dbx_poc
+
+workspace:
+  host: ${env.DATABRICKS_HOST}
+
 targets:
   dev:
-    default: true
     workspace:
       host: ${env.DATABRICKS_HOST}
 
-  prod:
-    workspace:
-      host: https://957456311226827.7.gcp.databricks.com
-      # You can add a separate PROD workspace later if needed
 
 # ================================
 # Workflows (Jobs)

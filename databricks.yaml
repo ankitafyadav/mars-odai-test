@@ -42,11 +42,5 @@ resources:
         min_workers: 1
         max_workers: 2
 
-# ================================
-# Permissions (Optional)
-# ================================
-permissions:
-  - group_name: admins
-    permission_level: CAN_MANAGE
 
 

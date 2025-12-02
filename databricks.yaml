@@ -21,9 +21,6 @@ resources:
 
       job_clusters:
         - job_cluster_key: poc_cluster
-          new_cluster:
-            serverless: true
-            spark_version: "14.3.x-scala2.12"   # ✔ REQUIRED
 
       tasks:
         - task_key: run_main_notebook

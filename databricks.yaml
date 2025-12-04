@@ -9,7 +9,7 @@ targets:
   dev:
     default: true
     workspace:
-      root_path: /Workspace/Repos/ankit.af.yadav@accenture.com/mars-odai-test
+      root_path: /Workspace/Shared/mars-odai-test/notebooks
     variables:
       brand_name: "scinkers"
       collection_id: "5e230de5cee846f18c90b39c00e94f56"

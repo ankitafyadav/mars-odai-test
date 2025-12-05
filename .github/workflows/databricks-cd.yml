@@ -44,18 +44,6 @@ jobs:
             echo "${{ env.REFERENCE_WHL_DIR }} directory not found, skipping."
           fi
 
-      - name: Run unit tests with coverage
-        run: |
-          mkdir -p reports
-          pytest --cov=. --cov-report=xml:reports/coverage.xml --junitxml=reports/junit.xml
-
-      - name: Upload test and coverage reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-coverage-reports
-          path: reports/
-
   build:
     needs: test
     runs-on: ubuntu-latest

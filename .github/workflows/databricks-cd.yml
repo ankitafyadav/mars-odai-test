@@ -1,0 +1,194 @@
+name: Bundle Deploy with Local Wheels
+
+env:
+  PYTHON_VERSION: "3.10"
+  REFERENCE_WHL_DIR: "reference_whls"
+  BUNDLE_TARGET: "dev"
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install requirements.txt (if present)
+        run: |
+          if [ -f requirements.txt ]; then
+            python -m pip install --upgrade pip
+            python -m pip install -r requirements.txt
+          else
+            echo "requirements.txt not found, skipping."
+          fi
+
+      - name: Install local wheel files from reference_whls (if present)
+        run: |
+          if [ -d "${{ env.REFERENCE_WHL_DIR }}" ]; then
+            if find "${{ env.REFERENCE_WHL_DIR }}" -type f -name "*.whl" -print -quit | grep -q .; then
+              echo "Installing wheels from ${{ env.REFERENCE_WHL_DIR }}..."
+              find "${{ env.REFERENCE_WHL_DIR }}" -type f -name "*.whl" -exec python -m pip install {} +
+            else
+              echo "No .whl files found in ${{ env.REFERENCE_WHL_DIR }}, skipping."
+            fi
+          else
+            echo "${{ env.REFERENCE_WHL_DIR }} directory not found, skipping."
+          fi
+
+      - name: Run unit tests with coverage
+        run: |
+          mkdir -p reports
+          pytest --cov=. --cov-report=xml:reports/coverage.xml --junitxml=reports/junit.xml
+
+      - name: Upload test and coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-coverage-reports
+          path: reports/
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install build dependencies
+        run: pip install build
+
+      - name: Determine Version
+        id: versioning
+        run: |
+          BRANCH_NAME=${GITHUB_REF_NAME}
+          BUILD_NUMBER=${GITHUB_RUN_NUMBER}
+          if [[ "$BRANCH_NAME" == "main" ]]; then
+            MAJOR=1
+            MINOR=0
+          elif [[ "$BRANCH_NAME" == "develop" ]]; then
+            MAJOR=0
+            MINOR=1
+          else
+            MAJOR=0
+            MINOR=0
+          fi
+          VERSION="${MAJOR}.${MINOR}.${BUILD_NUMBER}"
+          echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Version set to $VERSION"
+
+      - name: Build package
+        run: python -m build
+
+      - name: Upload built package
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist_package
+          path: dist/*.whl
+
+  deploy:
+    needs: build
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download wheel artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: dist_package
+          path: reference_whls
+
+      - name: Find simpel_package
+        id: available_simpel_package
+        run: |
+          count=$(find reference_whls -type f -name 'simpel_framework*' | wc -l)
+          if [ "$count" -eq 1 ]; then
+            package_name=$(find reference_whls -type f -name 'simpel_framework*' -exec basename {} \;)
+            echo "simpel_package=$package_name" >> $GITHUB_OUTPUT
+          elif [ "$count" -eq 0 ]; then
+            echo "No simpel_framework* files found." && exit 1
+          else
+            echo "Multiple simpel_framework* files found ($count); expected exactly one." && exit 1
+          fi
+
+      - name: Install prerequisites (jq)
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jq
+
+      - name: Install Databricks CLI (official)
+        uses: databricks/setup-cli@main
+
+      - name: Normalize DATABRICKS_HOST and get token
+        id: get_token
+        run: |
+          # remove trailing slashes from secret host
+          HOST_RAW="${{ secrets.DATABRICKS_HOST }}"
+          HOST=$(echo "$HOST_RAW" | sed 's:/*$::')
+          echo "DATABRICKS_HOST=$HOST" >> $GITHUB_ENV
+
+          # Request access token from Databricks OIDC token endpoint (client credentials)
+          # NOTE: ensure DATABRICKS_CLIENT_ID and DATABRICKS_CLIENT_SECRET are set as repo secrets
+          TOKEN_JSON=$(curl -s -X POST "$HOST/oidc/v1/token" \
+            -d "grant_type=client_credentials" \
+            -d "client_id=${{ secrets.DATABRICKS_CLIENT_ID }}" \
+            -d "client_secret=${{ secrets.DATABRICKS_CLIENT_SECRET }}" \
+            -d "scope=all-apis")
+          if [ -z "$TOKEN_JSON" ]; then
+            echo "Failed to fetch token: empty response" >&2
+            exit 1
+          fi
+          ACCESS_TOKEN=$(echo "$TOKEN_JSON" | jq -r .access_token)
+          if [ -z "$ACCESS_TOKEN" ] || [ "$ACCESS_TOKEN" = "null" ]; then
+            echo "Failed to parse access_token. Response:" >&2
+            echo "$TOKEN_JSON" >&2
+            exit 1
+          fi
+          echo "DATABRICKS_TOKEN=$ACCESS_TOKEN" >> $GITHUB_ENV
+          echo "Successfully obtained Databricks access token."
+
+      - name: Debug Databricks auth vars
+        run: |
+          echo "DATABRICKS_HOST=${DATABRICKS_HOST}"
+          echo "DATABRICKS_TOKEN present: ${DATABRICKS_TOKEN:+yes}"
+        env:
+          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
+
+      - name: Verify Databricks auth (jobs list)
+        run: |
+          databricks --version
+          databricks jobs list
+        env:
+          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}
+
+      - name: Deploy Databricks Bundle
+        working-directory: ./databricks
+        run: |
+          databricks bundle deploy -t "${{ env.BUNDLE_TARGET }}" \
+            --var "simpel_package=${{ steps.available_simpel_package.outputs.simpel_package }}" \
+            --var "build_version=${{ env.PACKAGE_VERSION }}"
+        env:
+          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ env.DATABRICKS_TOKEN }}

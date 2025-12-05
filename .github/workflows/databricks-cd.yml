@@ -55,7 +55,16 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: "pip"
+      
+      - name: Install requirements.txt (if present)
+        run: |
+          if [ -f requirements.txt ]; then
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+          else
+            echo "requirements.txt not found, skipping."
+          fi
+
 
       - name: Install build dependencies
         run: pip install build

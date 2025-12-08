@@ -1,0 +1,32 @@
+bundle:
+  name: dbx_poc
+
+variables:
+  brand_name: {}
+  collection_id: {}
+
+targets:
+  dev:
+    default: true
+    workspace:
+      root_path: /Workspace/Repos/ankit.af.yadav@accenture.com/mars-odai-test
+    variables:
+      brand_name: "scinkers"
+      collection_id: "5e230de5cee846f18c90b39c00e94f56"
+
+resources:
+  jobs:
+    poc_ingest_job:
+      name: aprimotodbx
+
+      tasks:
+        - task_key: run_main_notebook
+          notebook_task:
+            notebook_path: notebooks/Aprimo_to_dbx- Dev_Final.ipynb
+            base_parameters:
+              brand_name: ${var.brand_name}
+              collection_id: ${var.collection_id}
+
+      tags:
+        env: dev
+        project: aprimo

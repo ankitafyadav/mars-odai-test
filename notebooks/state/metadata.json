@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "config": {
+    "bundle": {
+      "git": {
+        "branch": "main",
+        "origin_url": "https://github.com/ankitafyadav/mars-odai-test",
+        "commit": "1ee10f130f6494a2f0925bad33362b83940eaeab",
+        "bundle_root_path": "."
+      }
+    },
+    "workspace": {
+      "file_path": "/Workspace/Shared/mars-odai-test/notebooks/files"
+    },
+    "resources": {
+      "jobs": {
+        "aprimotodbx": {
+          "id": "418902455103233",
+          "relative_path": "databricks.yaml"
+        }
+      }
+    },
+    "presets": {
+      "source_linked_deployment": false
+    }
+  },
+  "extra": {}
+}

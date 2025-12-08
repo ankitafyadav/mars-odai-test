@@ -1,9 +1,9 @@
 bundle:
-  name: dbx_mars_odia
+  name: dbx_poc
 
 variables:
   brand_configs:
-    description: "Brand → Collection mapping list"
+    description: "List of brands and collection IDs"
     default: []
 
 targets:
@@ -17,20 +17,20 @@ targets:
         - brand: "snickers"
           collection_id: "5e230de5cee846f18c90b39c00e94f56"
 
-        - brand: "skittles"
+        - brand: "skitlles"
           collection_id: "4de00c04d79442cfa6b8b39a00801e9a"
+
 
 resources:
   jobs:
     poc_ingest_job:
-      name: aprimotodbx-multibrand
+      for_each:
+        cfg: ${var.brand_configs}
+
+      name: ingest_${each.value.brand}
 
       tasks:
-        - for_each:
-            config: ${var.brand_configs}
-
-          task_key: run_${each.value.brand}
-
+        - task_key: run_notebook
           notebook_task:
             notebook_path: notebooks/Aprimo_to_dbx- Dev_Final.ipynb
             base_parameters:
@@ -40,3 +40,4 @@ resources:
       tags:
         env: dev
         project: aprimo
+        brand: ${each.value.brand}

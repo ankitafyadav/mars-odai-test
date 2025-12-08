@@ -2,8 +2,10 @@ bundle:
   name: dbx_poc
 
 variables:
-  brand_name: {}
-  collection_id: {}
+  brands:
+    description: "Brand list"
+  collection_ids:
+    description: "Collection ID list"
 
 targets:
   dev:
@@ -11,21 +13,27 @@ targets:
     workspace:
       root_path: /Workspace/Shared/mars-odai-test/notebooks
     variables:
-      brand_name: "scinkers"
-      collection_id: "5e230de5cee846f18c90b39c00e94f56"
+      brands: ["snickers", "skittles"]
+      collection_ids: [
+        "5e230de5cee846f18c90b39c00e94f56",
+        "4de00c04d79442cfa6b8b39a00801e9a"
+      ]
 
 resources:
   jobs:
     poc_ingest_job:
-      name: aprimotodbx
+      name: aprimotodbx-multibrand
 
       tasks:
-        - task_key: run_main_notebook
+        - for_each:
+            brand: ${var.brands}
+            collection: ${var.collection_ids}
+          task_key: run_${each.brand}
           notebook_task:
             notebook_path: notebooks/Aprimo_to_dbx- Dev_Final.ipynb
             base_parameters:
-              brand_name: ${var.brand_name}
-              collection_id: ${var.collection_id}
+              brand_name: ${each.brand}
+              collection_id: ${each.collection}
 
       tags:
         env: dev

@@ -36,4 +36,4 @@ jobs:
 
       # 6️⃣ Run the job defined in the bundle (correct CLI v2 syntax)
       - name: Run Databricks Job
-        run: databricks bundle run poc_ingest_job --target dev
+        run: databricks bundle run aprimotodbx --target dev

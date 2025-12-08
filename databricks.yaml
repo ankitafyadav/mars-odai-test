@@ -20,8 +20,8 @@ targets:
 
 resources:
   jobs:
-    poc_ingest_job:
-      name: ingest_${var.brand_name}
+    aprimotodbx:
+      name: aprimotodbx_${var.brand_name}
 
       tasks:
         - task_key: run_notebook

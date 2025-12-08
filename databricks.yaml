@@ -21,7 +21,7 @@ targets:
 resources:
  jobs:
     aprimotodbx_job:
-      name: Aprimo_MultiBrand_Ingestion
+      name: Aprimotodbx_multibrand
 
       tasks:
         # Brand 1
@@ -37,7 +37,7 @@ resources:
           notebook_task:
             notebook_path: notebooks/Aprimo_to_dbx- Dev_Final.ipynb
             base_parameters:
-              brand_name: "galaxy"
+              brand_name: "skittles"
               collection_id: "4de00c04d79442cfa6b8b39a00801e9a"
 
       tags:

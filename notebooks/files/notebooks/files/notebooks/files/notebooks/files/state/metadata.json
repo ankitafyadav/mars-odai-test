@@ -5,17 +5,17 @@
       "git": {
         "branch": "main",
         "origin_url": "https://github.com/ankitafyadav/mars-odai-test",
-        "commit": "23d8fbc67276b5cf244c8ca3de7d80ce3973de8a",
+        "commit": "8abf8268becf6dc393d60359a9400c1469bb50f3",
         "bundle_root_path": "."
       }
     },
     "workspace": {
-      "file_path": "/Workspace/Shared/mars-odai-test/notebooks/files"
+      "file_path": "/Workspace/Repos/ankit.af.yadav@accenture.com/mars-odai-test/files"
     },
     "resources": {
       "jobs": {
-        "aprimotodbx": {
-          "id": "418902455103233",
+        "poc_ingest_job": {
+          "id": "952291303613552",
           "relative_path": "databricks.yaml"
         }
       }

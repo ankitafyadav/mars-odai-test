@@ -2,8 +2,10 @@ bundle:
   name: dbx_mars_odia
 
 variables:
-  brand_configs:
-    description: "List of brand and collection ID mappings"
+  brand_name:
+    description: "Brand name for ingestion"
+  collection_id:
+    description: "Collection ID for ingestion"
 
 targets:
   dev:
@@ -13,27 +15,23 @@ targets:
       root_path: /Workspace/Shared/mars-odai-test/notebooks
 
     variables:
-      brand_configs:
-        - brand: "snickers"
-          collection_id: "5e230de5cee846f18c90b39c00e94f56"
-
-        - brand: "skittles"
-          collection_id: "4de00c04d79442cfa6b8b39a00801e9a"
-
+      brand_name: "snickers"
+      collection_id: "5e230de5cee846f18c90b39c00e94f56"
 
 resources:
   jobs:
     aprimotodbx:
-      name: aprimotodbx_multibrand
+      name: aprimotodbx_${var.brand_name}
 
       tasks:
         - task_key: run_notebook
           notebook_task:
             notebook_path: notebooks/Aprimo_to_dbx- Dev_Final.ipynb
             base_parameters:
-              brand_configs: ${var.brand_configs}
+              brand_name: ${var.brand_name}
+              collection_id: ${var.collection_id}
 
       tags:
         env: dev
+        brand: ${var.brand_name}
         project: aprimo
-        type: multibrand

@@ -1,23 +1,11 @@
 bundle:
   name: dbx_mars_odia
 
-variables:
-  brand_configs:
-    description: "List of brand and collection ID mappings"
-
 targets:
   dev:
     default: true
     workspace:
       root_path: /Workspace/Shared/mars-odai-test/notebooks
-
-    variables:
-      brand_configs:
-        - brand: "snickers"
-          collection_id: "5e230de5cee846f18c90b39c00e94f56"
-        - brand: "skittles"
-          collection_id: "4de00c04d79442cfa6b8b39a00801e9a"
-
 
 resources:
   jobs:
@@ -29,7 +17,11 @@ resources:
           notebook_task:
             notebook_path: notebooks/Aprimo_to_dbx- Dev_Final.ipynb
             base_parameters:
-              brand_configs: ${jsonencode(var.brand_configs)}
+              brand_configs: |
+                [
+                  {"brand_name": "snickers", "collection_id": "5e230de5cee846f18c90b39c00e94f56"},
+                  {"brand_name": "skittles", "collection_id": "4de00c04d79442cfa6b8b39a00801e9a"}
+                ]
 
       tags:
         env: dev

@@ -1,12 +1,6 @@
 bundle:
   name: mars_odai_snacking
-
-variables:
-  brand_name:
-    description: "Brand name for ingestion"
-  collection_id:
-    description: "Collection ID for ingestion"
-
+  
 targets:
   dev:
     default: true

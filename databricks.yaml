@@ -14,10 +14,6 @@ targets:
     workspace:
       root_path: /Workspace/Shared/mars-odai-test/notebooks
 
-    variables:
-      brand_name: "snickers"
-      collection_id: "5e230de5cee846f18c90b39c00e94f56"
-
 resources:
  jobs:
     aprimotodbx_job:

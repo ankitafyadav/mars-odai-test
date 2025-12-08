@@ -1,5 +1,5 @@
 bundle:
-  name: dbx_poc
+  name: mars-odia
 
 variables:
   brand_name:
@@ -19,19 +19,27 @@ targets:
       collection_id: "5e230de5cee846f18c90b39c00e94f56"
 
 resources:
-  jobs:
+ jobs:
     aprimotodbx_job:
-      name: aprimotodbx_${var.brand_name}
+      name: Aprimo_MultiBrand_Ingestion
 
       tasks:
-        - task_key: run_notebook
+        # Brand 1
+        - task_key: run_snickers
           notebook_task:
             notebook_path: notebooks/Aprimo_to_dbx- Dev_Final.ipynb
             base_parameters:
-              brand_name: ${var.brand_name}
-              collection_id: ${var.collection_id}
+              brand_name: "snickers"
+              collection_id: "5e230de5cee846f18c90b39c00e94f56"
+
+        # Brand 2
+        - task_key: run_skittles
+          notebook_task:
+            notebook_path: notebooks/Aprimo_to_dbx- Dev_Final.ipynb
+            base_parameters:
+              brand_name: "galaxy"
+              collection_id: "4de00c04d79442cfa6b8b39a00801e9a"
 
       tags:
         env: dev
-        brand: ${var.brand_name}
         project: aprimo
